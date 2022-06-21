@@ -1,4 +1,4 @@
-import { Component, VERSION } from '@angular/core';
+import { Component, VERSION, ViewChild } from '@angular/core';
 import AirDatepicker from 'air-datepicker';
 import localeFr from 'air-datepicker/locale/fr';
 
@@ -18,14 +18,29 @@ dayjs.extend(isSameOrBefore);
 })
 export class AppComponent {
   name = 'Angular ' + VERSION.major;
+  @ViewChild('airPicker') airPickerComponent: AirDatepicker;
 
   ngOnInit() {
+    let button = {
+      content: 'Select Previous Week',
+      className: 'custom-button-classname',
+      onClick: (dp) => {
+        //let date = new Date('2021-07-26');
+        let dateRange = [
+          new Date(2021, 6, 13),
+          new Date(2021, 6, 14)
+        ]
+        dp.selectDate(dateRange);
+        dp.setViewDate(dateRange);
+      },
+    };
+
     new AirDatepicker('#airPicker', {
       locale: localeFr,
       inline: true,
       range: true,
       dynamicRange: false,
-      multipleDatesSeparator: '-',
+      multipleDates: true,
       onRenderCell({ date, cellType }) {
         let dateUtc = dayjs(date).utc();
         let utcWeekStart = dayjs().utc().startOf('week');
@@ -45,7 +60,22 @@ export class AppComponent {
         console.log('formattedDate', formattedDate);
         console.log('datepicker', datepicker);
         console.log('-----');
+
+        /** 
+        datepicker.selectDate([
+          new Date(2021, 6, 13),
+          new Date(2021, 6, 14),
+          new Date(2021, 6, 15)
+        ])
+        */
+
+        //datepicker.selectDate(new date)
+
+
       },
+      buttons: [button, 'clear'], // Custom button, and pre-installed 'clear' button
     });
+
+    this.airPickerComponent.selectDate;
   }
 }
