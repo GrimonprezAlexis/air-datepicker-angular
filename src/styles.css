@@ -1,2 +1,6 @@
 /* Add application styles & imports to this file! */
 @import 'air-datepicker/air-datepicker.css';
+
+.-current-week- {
+  background-color: rgba(138, 79, 30, 0.1) !important;
+}

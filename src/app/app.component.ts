@@ -1,12 +1,20 @@
 import { Component, VERSION } from '@angular/core';
 import AirDatepicker from 'air-datepicker';
 import localeFr from 'air-datepicker/locale/fr';
+
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(utc);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   name = 'Angular ' + VERSION.major;
@@ -19,14 +27,17 @@ export class AppComponent {
       dynamicRange: false,
       multipleDatesSeparator: '-',
       onRenderCell({ date, cellType }) {
-        console.log('date', date, cellType);
+        let dateUtc = dayjs(date).utc();
+        let utcWeekStart = dayjs().utc().startOf('week');
+        let utcWeekEnd = dayjs().utc().endOf('week');
 
-        if (cellType === 'day') {
-          if (date.getDate() === 12) {
-            return {
-              classes: '-current-week-',
-            };
-          }
+        if (
+          dateUtc.isSameOrAfter(utcWeekStart) &&
+          dateUtc.isSameOrBefore(utcWeekEnd)
+        ) {
+          return {
+            classes: '-current-week-',
+          };
         }
       },
       onSelect: ({ date, formattedDate, datepicker }) => {
@@ -35,18 +46,6 @@ export class AppComponent {
         console.log('datepicker', datepicker);
         console.log('-----');
       },
-      buttons: [
-        {
-          content: 'Select this week',
-          className: 'custom-button-classname',
-          onClick: (dp) => {
-            let date = dayjs().format('YYYY-MM-DD');
-            dp.selectDate(date);
-            dp.setViewDate(date);
-          },
-        },
-        'clear',
-      ], // Custom button, and pre-installed 'clear' button
     });
   }
 }
